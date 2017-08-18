@@ -120,7 +120,7 @@ enum
 	endOption		=	255
 };
 
-typedef struct __attribute__((packed)) _RIP_MSG_FIXED
+typedef struct _RIP_MSG_FIXED
 {
 	uint8_t  op; 
 	uint8_t  htype; 
@@ -148,11 +148,12 @@ private:
   uint8_t  _dhcpDnsServerIp[4];
   uint32_t _dhcpLeaseTime;
   uint32_t _dhcpT1, _dhcpT2;
-  unsigned long _renewInSec;
-  unsigned long _rebindInSec;
+  signed long _renewInSec;
+  signed long _rebindInSec;
+  signed long _lastCheck;
   unsigned long _timeout;
   unsigned long _responseTimeout;
-  unsigned long _lastCheckLeaseMillis;
+  unsigned long _secTimeout;
   uint8_t _dhcp_state;
   EthernetUDP _dhcpUdpSocket;
   

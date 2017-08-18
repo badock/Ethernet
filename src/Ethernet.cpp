@@ -8,11 +8,21 @@ uint8_t EthernetClass::_state[MAX_SOCK_NUM] = {
 uint16_t EthernetClass::_server_port[MAX_SOCK_NUM] = { 
   0, 0, 0, 0 };
 
-int EthernetClass::begin(uint8_t *mac_address, unsigned long timeout, unsigned long responseTimeout)
+uint8_t EthernetClass::slaveSelect = 10;
+  
+void EthernetClass::select(uint8_t _ss)
+{
+  W5100.selectSS(_ss);
+  slaveSelect = _ss;
+}
+
+int EthernetClass::begin(uint8_t *mac_address)
 {
   static DhcpClass s_dhcp;
   _dhcp = &s_dhcp;
 
+  pinMode(slaveSelect,OUTPUT);
+  digitalWrite(slaveSelect,HIGH);
 
   // Initialise the basic info
   W5100.init();
@@ -22,7 +32,7 @@ int EthernetClass::begin(uint8_t *mac_address, unsigned long timeout, unsigned l
   SPI.endTransaction();
 
   // Now try to get our config info from a DHCP server
-  int ret = _dhcp->beginWithDHCP(mac_address, timeout, responseTimeout);
+  int ret = _dhcp->beginWithDHCP(mac_address);
   if(ret == 1)
   {
     // We've successfully found a DHCP server and got our configuration info, so set things
@@ -64,6 +74,8 @@ void EthernetClass::begin(uint8_t *mac_address, IPAddress local_ip, IPAddress dn
 
 void EthernetClass::begin(uint8_t *mac, IPAddress local_ip, IPAddress dns_server, IPAddress gateway, IPAddress subnet)
 {
+  pinMode(slaveSelect,OUTPUT);
+  digitalWrite(slaveSelect,HIGH);
   W5100.init();
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   W5100.setMACAddress(mac);
